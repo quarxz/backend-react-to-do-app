@@ -1,0 +1,56 @@
+.task {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-content: center;
+  align-items: center;
+
+  font-size: 21px;
+  line-height: 1;
+
+  width: 80%;
+  padding: 10px 20px;
+
+  border: 1px solid #999;
+  border-radius: 10px;
+
+  margin-top: 10px;
+}
+
+.task:hover {
+  cursor: pointer;
+  background-color: rgba(153, 153, 153, 0.3);
+}
+
+span.btn-edit {
+  font-size: 15px;
+  margin-right: 23px;
+}
+span.btn-edit:hover {
+  cursor: pointer;
+  color: greenyellow;
+}
+
+span.btn-delete {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  padding: 5px 10px;
+}
+span.btn-delete {
+  cursor: pointer;
+}
+
+svg.highlight {
+  margin: 0.2rem;
+  width: 15px;
+  height: 15px;
+  stroke-width: 5;
+  stroke: #999;
+}
+
+svg.highlight:hover {
+  stroke-width: 5;
+  stroke: red;
+}

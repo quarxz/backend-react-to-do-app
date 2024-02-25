@@ -1,0 +1,10 @@
+.user-button-bar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 0.5em;
+}
+
+.user-button {
+  margin: 0 0.5em;
+}
