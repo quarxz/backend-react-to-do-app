@@ -51,7 +51,7 @@ span.btn-edit::after {
   background-image: url("../assets/icons/pencil-solid.svg");
   background-repeat: no-repeat;
   background-size: 55%;
-  background-position: 50% 40%;
+  background-position: 30% 40%;
   padding: 10px 10px;
 }
 span.btn-edit:hover:after {

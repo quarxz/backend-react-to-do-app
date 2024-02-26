@@ -4,7 +4,6 @@ export function UserSelect({ users, onClickUserButton }) {
   function handleClickUserButton(e) {
     const userName = e.target.value;
     onClickUserButton(userName);
-    console.log(e.target);
   }
   return (
     <>
