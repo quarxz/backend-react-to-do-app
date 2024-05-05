@@ -6,30 +6,34 @@ import { UserButton } from "./components/UserButton";
 import { UserSelect } from "./components/UserSelect";
 import { Task } from "./components/Task";
 import { TaskForm } from "./components/TaskForm";
+import { TaskFormUpdate } from "./components/TaskFormUpdate";
 
 function App() {
   const [isloading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [users, setUsers] = useState([]);
+  const [data, setData] = useState([]);
+  const [selectedUser, setSelectedUser] = useState();
   const [tasks, setTasks] = useState();
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isFormUpdateOpen, setIsFormUpdateOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const [serverInfo, setServerInfo] = useState("");
 
-  const [handledTask, setHandledTask] = useState("I´m in action");
+  const [taskToEdit, setTaskToEdit] = useState();
 
-  const [taskIdToEdit, setTaskIdToEdit] = useState("");
-  const [updatedNote, setUpdatedNote] = useState("");
+  const url = "https://backend-node-js-routes.onrender.com";
+  // const url = "https://backend-mongoos-notes-taking-app.onrender.com";
 
   async function handleClickUserButton(name) {
     console.log("handleClickUserButton:", name);
-    const response = await axios.get(
-      `https://backend-node-js-routes.onrender.com/` + name
-    );
-    console.log(response.data);
-    setTasks(response.data);
+    const { data } = await axios.get(`${url}/${name}`);
+    console.log(data);
 
-    setHandledTask("Selected User: " + name);
+    setTasks(data);
+
+    setSelectedUser(name);
   }
 
   async function setServerInfoFn(data) {
@@ -41,60 +45,64 @@ function App() {
 
   async function handleAddTask(task) {
     console.log("handleAddTask:", task);
-    setTaskIdToEdit(task.id);
-    const { data } = await axios.post(
-      "https://backend-node-js-routes.onrender.com/" + tasks[0].name,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        content: task.content,
-      }
-    );
+    console.log("handleAddTasks:", tasks);
+    const { data } = await axios.post(`${url}/${tasks[0].name}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      content: task.content,
+    });
 
-    // console.log(data);
-    console.log(task);
-    console.log(tasks[0].name);
-    console.log(task.name);
-    console.log(task.content);
-
+    handleClickUserButton(tasks[0].name);
     setIsFormOpen((prevIsFormOpen) => !prevIsFormOpen);
-    // setServerInfoFn(data);
-    setHandledTask("Added new Note");
+    setServerInfoFn(data.message);
   }
 
   async function handleEditTask(task) {
     console.log("handleEditTask:", task);
-    // console.log(task);
-    // console.log(tasks.id);
-    // console.log(tasks.name);
-    // console.log(task.content);
-    // const { data } = await axios.put(
-    //   `https://backend-node-js-routes.onrender.com/${task.name}/${task.id}`,
-    //   {
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     content: task.content,
-    //   }
-    // );
-    // setIsFormOpen((prevIsFormOpen) => !prevIsFormOpen);
-    // setServerInfoFn(data);
-    setHandledTask("Edited Task");
+
+    setTaskToEdit(task);
+    console.log(taskToEdit);
+
+    if (isEditMode) {
+      console.log(taskToEdit);
+      console.log(taskToEdit.name);
+      console.log(taskToEdit.id);
+      console.log(task.content);
+      const { data } = await axios.put(`${url}/${taskToEdit.name}/${taskToEdit.id}`, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        content: task.content,
+      });
+
+      console.log(data);
+      setServerInfoFn(data.message);
+      setTasks(
+        tasks.map((task) => (taskToEdit.id == task.id ? { ...task, content: task.content } : task))
+      );
+      console.log(tasks);
+      handleClickUserButton(taskToEdit.name);
+
+      setIsEditMode(false);
+
+      // console.log([{ ...taskToEdit, content: task.content }]);
+      // setTasks([{ ...taskToEdit, content: task.content }, ...tasks]);
+    }
+
+    setIsFormUpdateOpen((prevIsFormUdateOpen) => !prevIsFormUdateOpen);
   }
 
   async function handleDeleteTask(task) {
     console.log("handleDeleteTask:", task);
-    const { data } = await axios.delete(
-      `https://backend-node-js-routes.onrender.com/${task.name}/${task.id}`
-    );
+    const { data } = await axios.delete(`${url}/${task.name}/${task.id}`);
     setTasks(
       tasks.filter((item) => {
         return item.id !== task.id;
       })
     );
     setServerInfoFn(data.message);
-    setHandledTask("Deleted Task");
   }
 
   useEffect(() => {
@@ -102,11 +110,9 @@ function App() {
       console.log("Load Data");
       try {
         setIsLoading(true);
-        const response = await axios.get(
-          `https://backend-node-js-routes.onrender.com`
-        );
+        const response = await axios.get(`${url}`);
         console.log(response.data);
-        setHandledTask("All Users are loaded");
+        console.log(response.status);
         setUsers(response.data);
       } catch (err) {
         setIsError(true);
@@ -130,39 +136,49 @@ function App() {
   return (
     <main>
       <section className={styles.card}>
-        <h1>ToDo</h1>
-        <span>{handledTask}</span>
+        <h1>ToDo's App</h1>
 
         {isloading ? (
           <span className="loader"></span>
         ) : (
           <>
             <UserSelect
+              data={data}
               users={users}
-              defaultUser={""}
+              defaultUser={selectedUser ? selectedUser : ""}
               onClickUserButton={(name) => {
                 handleClickUserButton(name);
               }}
             />
-            {/* <UserButton
-              users={users}
-              onClickUserButton={(name) => {
-                handleClickUserButton(name);
-              }}
-            /> */}
+            {/* {
+              <UserButton
+                users={users}
+                onClickUserButton={(name) => {
+                  handleClickUserButton(name);
+                }}
+              />
+            } */}
             {tasks ? (
               <>
                 <button
                   className={styles["btn-add-todo"]}
                   onClick={() => {
-                    setIsFormOpen((prevIsFormOpen) => !prevIsFormOpen);
+                    // setIsFormOpen((prevIsFormOpen) => !prevIsFormOpen);
+                    isFormUpdateOpen
+                      ? setIsFormUpdateOpen((prevIsFormUdateOpen) => !prevIsFormUdateOpen)
+                      : undefined;
+                    !isFormUpdateOpen
+                      ? setIsFormOpen((prevIsFormOpen) => !prevIsFormOpen)
+                      : undefined;
+                    setIsEditMode(false);
                   }}
                 >
-                  {isFormOpen ? "Cancel" : "Add Todo"}
+                  {isFormOpen || isFormUpdateOpen ? "Cancel" : "Add Todo"}
                 </button>
 
-                {isFormOpen ? (
-                  <TaskForm onAddTask={handleAddTask} />
+                {isFormOpen ? <TaskForm onAddTask={handleAddTask} /> : <></>}
+                {isFormUpdateOpen ? (
+                  <TaskFormUpdate onEditTask={handleEditTask} test={taskToEdit} />
                 ) : (
                   <></>
                 )}
@@ -171,6 +187,10 @@ function App() {
                     <Task
                       key={task.id}
                       task={task}
+                      onEditTask={(task) => {
+                        handleEditTask(task);
+                        setIsEditMode(true);
+                      }}
                       onAddTask={(task) => {
                         handleAddTask(task);
                       }}
@@ -182,11 +202,7 @@ function App() {
                 })}
               </>
             ) : undefined}
-            {serverInfo ? (
-              <p className={styles["server-info"]}>{serverInfo}</p>
-            ) : (
-              <p></p>
-            )}
+            {serverInfo ? <p className={styles["server-info"]}>{serverInfo}</p> : <p></p>}
           </>
         )}
       </section>

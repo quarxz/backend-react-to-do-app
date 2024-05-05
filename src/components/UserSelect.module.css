@@ -1,6 +1,19 @@
 .user-select {
+  font-family: "GrapeNuts", Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 700;
+
   padding: 0.5em 0.5em;
   width: 300px;
-  font-size: 1.3em;
+  font-size: 1.8em;
   border-radius: 10px;
+
+  cursor: pointer;
+}
+
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding: 5px;
 }

@@ -52,10 +52,14 @@
 }
 
 .btn-add-todo {
+  font-size: 1.3em;
   width: 200px;
   padding: 1em 1em;
 }
 
 .server-info {
+  font-size: 1.8em;
   color: #888;
+  color: aquamarine;
+  font-weight: 700;
 }
